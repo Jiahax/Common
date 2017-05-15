@@ -1,0 +1,44 @@
+
+.typeahead.dropdown-menu {  
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  margin-top: .2em;  
+  padding: .2em 0;  
+  border: 1px solid #ccc;
+  border-radius: 2px;
+  list-style-type: none;
+  background-color: #fff;  
+}
+.typeahead.dropdown-menu > li {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  padding: .2em .5em;
+}
+.typeahead.dropdown-menu > li:hover {
+  background-color: #4fbbc9;
+}
+.typeahead.dropdown-menu > li > a {
+  color: black;
+  text-decoration-line: none;
+}
+
+
+.mention_image {
+  float: left;
+  margin-right: 5px;
+  -webkit-border-radius: 2px;
+  -moz-border-radius: 2px;
+  border-radius: 2px;
+  width: 20px;
+  height: 20px;
+}
+.mention_name {
+  font-size: 12px;
+}
+.mention_username {
+  font-size: 12px;
+  color: #999;
+}
