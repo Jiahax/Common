@@ -1,0 +1,57 @@
+﻿namespace Microsoft.OpenPublishing.Build.Common
+{
+    using System;
+    using System.Collections.Generic;
+    using System.Collections.Specialized;
+    using System.Linq;
+    using System.Web;
+
+    public static class UriExtension
+    {
+        /// <summary>
+        /// Merge a dictionary of values with an existing <see cref="Uri"/>
+        /// </summary>
+        /// <param name="uri">Original request Uri</param>
+        /// <param name="parameters">Collection of key-value pairs</param>
+        /// <returns>Updated request Uri</returns>
+        public static Uri ApplyQueryParameters(this Uri uri, IReadOnlyDictionary<string, string> parameters)
+        {
+            Guard.ArgumentNotNull(uri, nameof(uri));
+
+            if (parameters == null || parameters.Count == 0)
+            {
+                return uri;
+            }
+
+            string uriString = uri.OriginalString.Split('?')[0];
+            string queryString = uri.OriginalString.Substring(uriString.Length);
+
+            NameValueCollection paramCollection = !string.IsNullOrEmpty(queryString) ? HttpUtility.ParseQueryString(queryString) : new NameValueCollection();
+
+            foreach (var parameter in parameters)
+            {
+                // overwrite existing key
+                if (parameter.Value != null)
+                {
+                    paramCollection[parameter.Key] = parameter.Value;
+                }
+            }
+
+            var query = string.Join("&", paramCollection.Cast<string>().Select(key => $"{Uri.EscapeDataString(key)}={Uri.EscapeDataString(paramCollection[key])}"));
+            return new Uri($"{uriString}?{query}", UriKind.RelativeOrAbsolute);
+        }
+
+        /// <summary>
+        /// Check if <paramref name="url"/> is absolute url
+        /// </summary>
+        /// <param name="url">Url string</param>
+        /// <returns>Return true if <paramref name="url"/> is absolute url, otherwise return false</returns>
+        public static bool IsAbsoluteUrl(this string url)
+        {
+            Guard.ArgumentNotNullOrEmpty(url, nameof(url));
+
+            Uri result;
+            return Uri.TryCreate(url, UriKind.Absolute, out result);
+        }
+    }
+}
