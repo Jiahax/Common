@@ -1,0 +1,160 @@
+namespace Common
+{
+    using System;
+    using System.ComponentModel;
+    using System.Diagnostics;
+    using System.IO;
+    using System.Linq;
+    using System.Reflection;
+    using System.Runtime.CompilerServices;
+    using System.Security.Cryptography;
+    using System.Text;
+    using System.Threading.Tasks;
+
+    public static class Utility
+    {
+        /// <summary>
+        /// Hash <paramref name="input"/> to bytes with <paramref name="algorithm"/>
+        /// </summary>
+        /// <param name="input">Input string to hash</param>
+        /// <param name="algorithm">Hash algorithm</param>
+        /// <param name="encoding">Encoding of input, if not set, default is UTF8</param>
+        /// <returns>The computed hash of input string</returns>
+        public static byte[] ComputeHash(string input, HashAlgorithm algorithm, Encoding encoding = null)
+        {
+            Guard.ArgumentNotNullOrEmpty(input, nameof(input));
+            Guard.ArgumentNotNull(algorithm, nameof(algorithm));
+
+            if (encoding == null)
+            {
+                encoding = Encoding.UTF8;
+            }
+
+            return algorithm.ComputeHash(encoding.GetBytes(input));
+        }
+
+        /// <summary>
+        /// Hash <paramref name="input"/> to bytes with MD5 and return the hash in Guid format
+        /// </summary>
+        /// <param name="input">Input string to hash</param>
+        /// <param name="encoding">Encoding of input, if not set, default is UTF8</param>
+        /// <returns>The computed hash in Guid format</returns>
+        public static Guid GetMd5HashedGuid(string input, Encoding encoding = null)
+        {
+            Guard.ArgumentNotNullOrEmpty(input, nameof(input));
+
+            byte[] hashedBytes;
+            using (var csp = new MD5CryptoServiceProvider())
+            {
+                hashedBytes = ComputeHash(input, csp, encoding ?? Encoding.UTF8);
+            }
+
+            return new Guid(hashedBytes);
+        }
+
+        /// <summary>
+        /// returns the encrypt key of GitHub payload, Vso also set this encrypt key in request header
+        /// </summary>
+        /// <param name="guid">guid used to get encrypt key</param>
+        /// <returns>Encrypt key string</returns>
+        public static string GetEncryptKeyString(Guid guid)
+        {
+            return guid.ToString("D").ToUpper();
+        }
+
+        /// <summary>
+        /// Get the directory path of the current assembly
+        /// </summary>
+        /// <returns>directory path of the current assembly</returns>
+        public static string GetCurrentAssemblyFolder()
+        {
+            var assemblyUri = new Uri(Assembly.GetExecutingAssembly().GetName().CodeBase);
+            return Path.GetDirectoryName(assemblyUri.LocalPath);
+        }
+
+        public static TaskAwaiter<T> GetAwaiter<T>(this Lazy<Task<T>> lazyTask)
+        {
+            return lazyTask.Value.GetAwaiter();
+        }
+
+        /// <summary>
+        /// Get base64 string
+        /// </summary>
+        /// <param name="input">Input string to convert</param>
+        /// <param name="encoding">Encoding of input, if not set, default is UTF8</param>
+        /// <returns>The string of Base64</returns>
+        public static string ToBase64String(this string input, Encoding encoding = null)
+        {
+            Guard.ArgumentNotNullOrEmpty(input, nameof(input));
+
+            return Convert.ToBase64String((encoding ?? Encoding.UTF8).GetBytes(input));
+        }
+
+        /// <summary>
+        /// Get base64 string
+        /// </summary>
+        /// <param name="input">Input byte array to convert</param>
+        /// <returns>The string of Base64</returns>
+        public static string ToBase64String(this byte[] input)
+        {
+            Guard.ArgumentNotNull(input, nameof(input));
+
+            return Convert.ToBase64String(input);
+        }
+
+        /// <summary>
+        /// Get current assembly version
+        /// </summary>
+        /// <returns>current assembly version</returns>
+        public static Version GetCurrentAssemblyVersion()
+        {
+            return new Version(FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).FileVersion);
+        }
+
+        /// <summary>
+        /// Compare if two array are equals
+        /// </summary>
+        /// <typeparam name="T">type of array</typeparam>
+        /// <param name="a1">array 1</param>
+        /// <param name="a2">array 2</param>
+        /// <returns>true if equal, otherwise false</returns>
+        public static bool ArraysEqual<T>(T[] a1, T[] a2)
+        {
+            if (ReferenceEquals(a1, a2))
+                return true;
+
+            if (a1 == null || a2 == null)
+                return false;
+
+            if (a1.Length != a2.Length)
+                return false;
+
+            return a1.SequenceEqual(a2);
+        }
+
+        /// <summary>
+        /// Try get description string from DescriptionAttribute, if DescriptionAttribute is not set, return source.ToString() as description.
+        /// </summary>
+        /// <typeparam name="T">type of source</typeparam>
+        /// <param name="source">source object to get description</param>
+        /// <param name="description">description string</param>
+        /// <returns>true if description string is parsed from DescriptionAttribute</returns>
+        public static bool TryGetDescriptionFromDescriptionAttribute<T>(T source, out string description)
+        {
+            Guard.ArgumentNotNull(source, nameof(source));
+
+            var fi = source.GetType().GetField(source.ToString());
+
+            var attributes = (DescriptionAttribute[])fi.GetCustomAttributes(typeof(DescriptionAttribute), false);
+
+            if (attributes.Length > 0)
+            {
+                description = attributes[0].Description;
+                return true;
+            }
+
+            description = source.ToString();
+            return false;
+        }
+    }
+}
