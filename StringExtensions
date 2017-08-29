@@ -1,0 +1,46 @@
+namespace Common
+{
+    using System;
+    using System.IO;
+
+    public static class StringExtensions
+    {
+        public static bool Contains(this string source, string value, StringComparison comparisonType)
+        {
+            Guard.ArgumentNotNull(source, nameof(source));
+            Guard.ArgumentNotNull(value, nameof(value));
+
+            return source.IndexOf(value, comparisonType) >= 0;
+        }
+
+        public static string ToNormalizedRelativePath(this string relativePath, char pathSeparator = '/')
+        {
+            Guard.ArgumentNotNullOrEmpty(relativePath, nameof(relativePath));
+            Guard.Argument(() => !Path.IsPathRooted(relativePath), nameof(relativePath), $"{nameof(relativePath)} cannot be absolute.");
+
+            string[] pathParts = relativePath.Split(new[] { '\\', '/' }, StringSplitOptions.RemoveEmptyEntries);
+
+            return string.Join(pathSeparator.ToString(), pathParts);
+        }
+
+        public static string TrimEnd(this string input, string suffixToRemove)
+        {
+            Guard.ArgumentNotNull(input, nameof(input));
+            Guard.ArgumentNotNullOrEmpty(suffixToRemove, nameof(suffixToRemove));
+
+            if (input.EndsWith(suffixToRemove))
+            {
+                return input.Substring(0, input.LastIndexOf(suffixToRemove));
+            }
+            else
+            {
+                return input;
+            }
+        }
+
+        public static string BackSlashToForwardSlash(this string input)
+        {
+            return input?.Replace('\\', '/');
+        }
+    }
+}
