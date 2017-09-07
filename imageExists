@@ -1,0 +1,20 @@
+function imageExists(image_url){
+
+    var http = new XMLHttpRequest();
+
+    http.open('HEAD', image_url, false);
+    http.send();
+
+    return http.status != 404;
+
+}
+
+
+$.get(image_url)
+    .done(function() { 
+        // Do something now you know the image exists.
+
+    }).fail(function() { 
+        // Image doesn't exist - do something else.
+
+    });
