@@ -1,4 +1,4 @@
-﻿namespace Microsoft.OpenPublishing.Build.Common
+﻿namespace Common
 {
     using System.Net;
     using System.Net.Http;
