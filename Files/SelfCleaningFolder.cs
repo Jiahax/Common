@@ -1,4 +1,4 @@
-﻿namespace Microsoft.OpenPublishing.Build.Common.Files
+﻿namespace Common.Files
 {
     using System;
     using System.IO;
