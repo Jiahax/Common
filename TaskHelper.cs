@@ -1,4 +1,4 @@
-﻿namespace Microsoft.OpenPublishing.Build.Common
+﻿namespace Common
 {
     using System;
     using System.Collections.Generic;
