@@ -1,12 +1,33 @@
 namespace Common
 {
+    /// Add by Jiahax
+    /// Guard params for controller
+
     using System;
+    using System.Diagnostics;
+    using System.Reflection;
 
     /// <summary>
     /// Represents a simple class for validating parameters and throwing exceptions.
     /// </summary>
     public static class Guard
     {
+        /// <summary>
+        /// Get method full name for throwing exception
+        /// </summary>
+        /// <returns></returns>
+        public static string GetMethod()
+        {
+            StackTrace ss = new StackTrace(true);
+            MethodBase mb = ss.GetFrame(1).GetMethod();
+
+            string declaring = mb.DeclaringType.FullName;
+
+            string method = mb.Name;
+
+            return string.Format("{0}.{1}", declaring, method);
+        }
+
         /// <summary>
         /// Validates argumentValue is not null and throws ArgumentNullException if it is null.
         /// </summary>
@@ -18,10 +39,7 @@ namespace Common
         /// </param>
         public static void ArgumentNotNull(object argumentValue, string argumentName)
         {
-            if (argumentValue == null)
-            {
-                throw new ArgumentNullException(argumentName);
-            }
+            if (argumentValue == null) { throw new ArgumentNullException(argumentName); }
         }
 
         /// <summary>
@@ -37,10 +55,8 @@ namespace Common
         public static void ArgumentNotNullOrEmpty(string argumentValue, string argumentName)
         {
             ArgumentNotNull(argumentValue, argumentName);
-            if (string.IsNullOrEmpty(argumentValue))
-            {
-                throw new ArgumentException(argumentName);
-            }
+
+            if (string.IsNullOrEmpty(argumentValue)) { throw new ArgumentException(argumentName); }
         }
 
         /// <summary>
@@ -57,10 +73,7 @@ namespace Common
         /// </param>
         public static void Argument(Func<bool> validationFunction, string argumentName, string argumentMessage = null)
         {
-            if (validationFunction == null)
-            {
-                return;
-            }
+            if (validationFunction == null) { return; }
 
             if (!validationFunction())
             {
