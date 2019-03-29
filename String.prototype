@@ -1,0 +1,33 @@
+String.prototype.Format = function (args) {
+        var strfmt = this.Trim();
+        if (_isNull(strfmt)) {
+            return strfmt;
+        }
+        var result = strfmt.Trim();
+        if (arguments.length > 0) {
+            if (arguments.length == 1 && typeof (args) == "object") {
+                for (var key in args) {
+                    if (args[key] != undefined) {
+                        var reg = new RegExp("({" + key + "})", "g");
+                        result = result.replace(reg, args[key]);
+                    }
+                }
+            }
+            else {
+                for (var i = 0; i < arguments.length; i++) {
+                    if (!_isNull(arguments[i])) {
+                        var reg = new RegExp("({[" + (i) + "]})", "g");
+                        result = result.replace(reg, arguments[i]);
+                    }
+                }
+            }
+        }
+        return result;
+    }
+    
+    Array.prototype.select = Array.prototype.map || function (selector, context) {
+        context = context || window;
+        var array = [];
+        for (var i = 0; i < l; i++) { array.push(selector.call(context, this[i], i, this)); }
+        return array;
+    };
